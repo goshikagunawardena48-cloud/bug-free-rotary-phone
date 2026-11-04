@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O/L Examination - Live Countdown</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Montserrat:wght@400;600;700;800;900&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #0d1a0d;
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .font-handwriting {
+            font-family: 'Caveat', cursive;
+        }
+
+        .font-brush {
+            font-family: 'Caveat', cursive;
+            font-weight: 700;
+        }
+
+        /* Dynamic Animated RGB Background Gradient */
+        @keyframes rgbBackground {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Ambient glowing particle animations with RGB shifting */
+        .bg-overlay {
+            background: linear-gradient(
+                -45deg, 
+                rgba(5, 19, 7, 0.88), 
+                rgba(11, 43, 17, 0.88), 
+                rgba(7, 32, 28, 0.88), 
+                rgba(27, 18, 44, 0.88), 
+                rgba(24, 41, 12, 0.88)
+            );
+            background-size: 400% 400%;
+            background-position: center;
+            animation: rgbBackground 15s ease infinite;
+            position: relative;
+        }
+
+        /* Dynamic Changing Background Images */
+        .bg-image-layer {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            transition: opacity 2s ease-in-out, transform 8s ease-in-out;
+            opacity: 0;
+            z-index: -1;
+            mix-blend-mode: overlay;
+        }
+
+        .bg-image-layer.active {
+            opacity: 0.55;
+            transform: scale(1.05);
+        }
+
+        /* Books Stack Simulation styling on left */
+        .book-spine {
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.7);
+            border-left: 5px solid rgba(255,255,255,0.25);
+            transition: transform 0.3s ease;
+        }
+        .book-spine:hover {
+            transform: translateX(4px);
+        }
+
+        /* Glassmorphism Styles matching the artwork */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .glass-countdown-panel {
+            background: linear-gradient(180deg, rgba(14, 51, 19, 0.85) 0%, rgba(6, 31, 10, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid rgba(74, 222, 128, 0.4);
+            box-shadow: 0 0 30px rgba(34, 197, 94, 0.3),
+                        inset 0 0 15px rgba(34, 197, 94, 0.2);
+        }
+
+        .glass-banner {
+            background: linear-gradient(90deg, rgba(10, 35, 12, 0.9) 0%, rgba(18, 59, 22, 0.9) 50%, rgba(10, 35, 12, 0.9) 100%);
+            backdrop-filter: blur(12px);
+            border: 1.5px solid rgba(234, 179, 8, 0.4);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4),
+                        0 0 15px rgba(234, 179, 8, 0.15);
+        }
+
+        /* Books Stack Simulation styling on left */
+        .book-spine {
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+            border-left: 4px solid rgba(255,255,255,0.2);
+        }
+
+        /* SVG Circular Progress styling */
+        .circle-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 6;
+        }
+
+        .circle-progress {
+            fill: none;
+            stroke: #4ade80;
+            stroke-width: 6;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.5s ease-out;
+            filter: drop-shadow(0px 0px 6px #22c55e);
+        }
+
+        /* Pulse glow animation */
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 25px rgba(34, 197, 94, 0.35);
+                border-color: rgba(74, 222, 128, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(74, 222, 128, 0.8), 0 0 20px rgba(250, 204, 21, 0.4);
+                border-color: rgba(250, 204, 21, 0.6);
+            }
+        }
+
+        .animate-glow {
+            animation: pulse-glow 4s infinite ease-in-out;
+        }
+
+        /* Number bounce/pop animation when numbers change */
+        .number-change {
+            animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.7) translateY(-5px); opacity: 0.4; filter: brightness(1.8); }
+            50% { transform: scale(1.15); opacity: 1; filter: brightness(1.3); }
+            100% { transform: scale(1) translateY(0); opacity: 1; filter: brightness(1); }
+        }
+
+        /* Glow animation for header title */
+        @keyframes headerShine {
+            0%, 100% { text-shadow: 0 0 15px rgba(250, 204, 21, 0.4); }
+            50% { text-shadow: 0 0 30px rgba(250, 204, 21, 0.9), 0 0 10px rgba(255, 255, 255, 0.8); }
+        }
+        .animate-title-glow {
+            animation: headerShine 3s infinite ease-in-out;
+        }
+
+        /* Minute Flash Animation Effect */
+        @keyframes minuteFlashAnim {
+            0% {
+                box-shadow: 0 0 30px rgba(34, 197, 94, 0.3);
+                filter: brightness(1);
+            }
+            25% {
+                box-shadow: 0 0 90px rgba(250, 204, 21, 1), 0 0 40px rgba(255, 255, 255, 0.9);
+                filter: brightness(1.7);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(34, 197, 94, 0.3);
+                filter: brightness(1);
+            }
+            75% {
+                box-shadow: 0 0 90px rgba(74, 222, 128, 1), 0 0 40px rgba(250, 204, 21, 0.9);
+                filter: brightness(1.7);
+            }
+            100% {
+                box-shadow: 0 0 30px rgba(34, 197, 94, 0.3);
+                filter: brightness(1);
+            }
+        }
+
+        .minute-flash {
+            animation: minuteFlashAnim 1s ease-in-out !important;
+        }
+
+        /* Floating Flying Study Elements & Formulas Effect */
+        @keyframes floatStudyItem {
+            0% {
+                transform: translateY(110vh) rotate(0deg) scale(0.8);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.7;
+            }
+            80% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-20vh) rotate(360deg) scale(1.1);
+                opacity: 0;
+            }
+        }
+
+        .floating-study-item {
+            position: absolute;
+            pointer-events: none;
+            animation: floatStudyItem linear infinite;
+            font-family: 'Caveat', cursive;
+            text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+            z-index: 2;
+            white-space: nowrap; /* Fixes text wrapping bug for long formulas */
+            user-select: none;
+        }
+    </style>
+</head>
+<body class="bg-overlay flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 relative select-none">
+
+    <!-- Dynamic Transitioning Background Image Layers -->
+    <div id="bg-layer-1" class="bg-image-layer active" style="background-image: url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div id="bg-layer-2" class="bg-image-layer" style="background-image: url('https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div id="bg-layer-3" class="bg-image-layer" style="background-image: url('https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div id="bg-layer-4" class="bg-image-layer" style="background-image: url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=1600&auto=format&fit=crop');"></div>
+
+    <!-- Left Side Decorative Book Stack (as seen in original photo) -->
+    <div class="hidden lg:flex flex-col space-y-1.5 absolute left-6 bottom-12 z-10 w-44 pointer-events-none">
+        <div class="book-spine bg-slate-800 text-slate-200 text-xs font-bold px-3 py-2 rounded-r-md border-l-amber-600 shadow-xl flex justify-between items-center">
+            <span>Mathematics</span>
+            <i class="fa-solid fa-calculator text-[10px] text-amber-400"></i>
+        </div>
+        <div class="book-spine bg-emerald-900 text-emerald-100 text-xs font-bold px-3 py-2 rounded-r-md border-l-emerald-400 shadow-xl flex justify-between items-center">
+            <span>Science</span>
+            <i class="fa-solid fa-flask text-[10px] text-emerald-300"></i>
+        </div>
+        <div class="book-spine bg-indigo-900 text-indigo-100 text-xs font-bold px-3 py-2 rounded-r-md border-l-indigo-400 shadow-xl flex justify-between items-center">
+            <span>English</span>
+            <i class="fa-solid fa-book-open text-[10px] text-indigo-300"></i>
+        </div>
+        <div class="book-spine bg-rose-900 text-rose-100 text-xs font-bold px-3 py-2 rounded-r-md border-l-rose-400 shadow-xl flex justify-between items-center">
+            <span>Sinhala</span>
+            <i class="fa-solid fa-pen-nib text-[10px] text-rose-300"></i>
+        </div>
+        <div class="book-spine bg-amber-900 text-amber-100 text-xs font-bold px-3 py-2 rounded-r-md border-l-amber-500 shadow-xl flex justify-between items-center">
+            <span>History</span>
+            <i class="fa-solid fa-landmark text-[10px] text-amber-300"></i>
+        </div>
+    </div>
+
+    <!-- Floating Background Particles -->
+    <div id="particles-container" class="absolute inset-0 overflow-hidden pointer-events-none"></div>
+
+    <!-- Floating Study Elements & Formulas Container -->
+    <div id="study-elements-container" class="absolute inset-0 overflow-hidden pointer-events-none z-0"></div>
+
+    <!-- Decorative Top Foliage / Leaves effect -->
+    <div class="absolute top-0 right-0 w-64 h-64 opacity-30 pointer-events-none bg-radial from-green-400 to-transparent blur-3xl"></div>
+    <div class="absolute bottom-0 left-0 w-80 h-80 opacity-20 pointer-events-none bg-radial from-emerald-500 to-transparent blur-3xl"></div>
+
+    <!-- Main Container -->
+    <div class="w-full max-w-4xl flex flex-col items-center z-10 space-y-6 sm:space-y-8 my-auto">
+
+        <!-- HEADER SECTION -->
+        <div class="relative w-full text-center flex flex-col items-center">
+            
+            <!-- Graduation Cap Graphic -->
+            <div class="relative inline-block mb-1">
+                <!-- Cap SVG -->
+                <svg class="w-16 h-16 sm:w-20 sm:h-20 drop-shadow-[0_8px_15px_rgba(0,0,0,0.6)] transform -rotate-6" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Cap Base -->
+                    <path d="M50 20 L90 38 L50 56 L10 38 Z" fill="#1e1e1e" stroke="#333" stroke-width="2"/>
+                    <path d="M50 22 L85 38 L50 54 L15 38 Z" fill="#2d2d2d"/>
+                    <!-- Skull Cap -->
+                    <path d="M30 48 V65 C30 73 70 73 70 65 V48" fill="#1a1a1a" stroke="#111" stroke-width="2"/>
+                    <!-- Tassel Band -->
+                    <path d="M50 38 L78 60" stroke="#eab308" stroke-width="3" stroke-linecap="round"/>
+                    <circle cx="50" cy="38" r="3" fill="#facc15"/>
+                    <rect x="75" y="60" width="6" height="14" rx="2" fill="#eab308"/>
+                </svg>
+            </div>
+
+            <!-- Main Title & Side Tagline -->
+            <div class="relative w-full flex flex-col md:flex-row items-center justify-center">
+                
+                <!-- Main Header Title -->
+                <div class="flex flex-col items-center">
+                    <h1 class="text-5xl sm:text-7xl font-black tracking-tight text-white drop-shadow-[0_4px_10px_rgba(0,0,0,0.8)] italic">
+                        O/L
+                    </h1>
+                    <h2 class="text-3xl sm:text-5xl font-extrabold text-yellow-400 tracking-wide font-brush animate-title-glow -mt-2 sm:-mt-3">
+                        Examination 2026
+                    </h2>
+                    <!-- Yellow Curved Underline accent -->
+                    <svg class="w-48 sm:w-72 h-4 -mt-1" viewBox="0 0 200 15" fill="none">
+                        <path d="M5 8 Q 100 14 195 4" stroke="#facc15" stroke-width="4" stroke-linecap="round"/>
+                    </svg>
+                </div>
+
+                <!-- Handwritten Side Encouragement Banner -->
+                <div class="mt-4 md:mt-0 md:absolute md:right-4 md:top-2 text-center md:text-left">
+                    <p class="font-handwriting text-2xl sm:text-3xl text-emerald-300 transform md:rotate-6 drop-shadow-md">
+                        You Can<br class="hidden md:inline"/> Do It !
+                    </p>
+                    <svg class="w-20 h-4 hidden md:block text-yellow-300 transform rotate-12 mt-1" viewBox="0 0 100 20" fill="none" stroke="currentColor">
+                        <path d="M10 10 Q 50 18 90 5" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Sub-motto handwritten string -->
+            <p class="font-handwriting text-xl sm:text-2xl text-emerald-200 mt-2 tracking-wider drop-shadow">
+                Dream Big... Study Hard... Achieve More...!
+            </p>
+        </div>
+
+        <!-- DATE DISPLAY CARD (Frosted Glass) -->
+        <div class="glass-card rounded-2xl p-4 sm:p-5 w-full max-w-xl flex items-center justify-between shadow-2xl relative overflow-hidden group transition-all duration-300 hover:border-emerald-400/50">
+            <!-- Left Side: Calendar Tear-off Icon -->
+            <div class="flex items-center space-x-4">
+                <div class="relative w-16 h-20 sm:w-20 sm:h-24 bg-white rounded-xl shadow-xl flex flex-col overflow-hidden transform group-hover:scale-105 transition-transform">
+                    <!-- Calendar Rings -->
+                    <div class="bg-red-600 h-7 sm:h-8 flex items-center justify-around px-2">
+                        <span class="w-1.5 h-2.5 bg-gray-300 rounded-full shadow-inner"></span>
+                        <span class="w-1.5 h-2.5 bg-gray-300 rounded-full shadow-inner"></span>
+                        <span class="w-1.5 h-2.5 bg-gray-300 rounded-full shadow-inner"></span>
+                        <span class="w-1.5 h-2.5 bg-gray-300 rounded-full shadow-inner"></span>
+                    </div>
+                    <!-- Calendar Month Text -->
+                    <div class="bg-red-600 text-white text-[10px] sm:text-xs font-bold text-center tracking-widest uppercase pb-1">
+                        DECEMBER
+                    </div>
+                    <!-- Calendar Day Number -->
+                    <div id="card-day-display" class="flex-1 flex items-center justify-center text-slate-900 font-black text-2xl sm:text-3xl">
+                        08
+                    </div>
+                </div>
+
+                <!-- Divider Line -->
+                <div class="h-12 sm:h-16 w-0.5 bg-white/20"></div>
+
+                <!-- Date Info Text -->
+                <div class="text-left">
+                    <h3 class="text-lg sm:text-2xl font-bold text-white tracking-wide">
+                        O/L Examination
+                    </h3>
+                    <p id="card-full-date" class="text-xl sm:text-3xl font-extrabold text-yellow-400 tracking-tight">
+                        December 8
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN COUNTDOWN PANEL (4 GLOWING CIRCLES) -->
+        <div class="glass-countdown-panel animate-glow w-full rounded-3xl p-6 sm:p-8 shadow-2xl">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 justify-items-center">
+
+                <!-- DAYS CIRCLE -->
+                <div class="flex flex-col items-center group">
+                    <div class="relative w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center">
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                            <circle class="circle-bg" cx="50" cy="50" r="42"/>
+                            <circle id="days-progress" class="circle-progress" cx="50" cy="50" r="42" stroke-dasharray="263.89" stroke-dashoffset="0"/>
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                            <span id="days" class="text-3xl sm:text-4xl font-black text-white tracking-tight drop-shadow">00</span>
+                            <span class="text-xs sm:text-sm font-semibold text-emerald-200 mt-0.5">Days</span>
+                            <i class="fa-regular fa-calendar-days text-emerald-400 text-xs sm:text-sm mt-1"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HOURS CIRCLE -->
+                <div class="flex flex-col items-center group">
+                    <div class="relative w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center">
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                            <circle class="circle-bg" cx="50" cy="50" r="42"/>
+                            <circle id="hours-progress" class="circle-progress" cx="50" cy="50" r="42" stroke-dasharray="263.89" stroke-dashoffset="0"/>
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                            <span id="hours" class="text-3xl sm:text-4xl font-black text-white tracking-tight drop-shadow">00</span>
+                            <span class="text-xs sm:text-sm font-semibold text-emerald-200 mt-0.5">Hours</span>
+                            <i class="fa-regular fa-clock text-emerald-400 text-xs sm:text-sm mt-1"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MINUTES CIRCLE -->
+                <div class="flex flex-col items-center group">
+                    <div class="relative w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center">
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                            <circle class="circle-bg" cx="50" cy="50" r="42"/>
+                            <circle id="minutes-progress" class="circle-progress" cx="50" cy="50" r="42" stroke-dasharray="263.89" stroke-dashoffset="0"/>
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                            <span id="minutes" class="text-3xl sm:text-4xl font-black text-white tracking-tight drop-shadow">00</span>
+                            <span class="text-xs sm:text-sm font-semibold text-emerald-200 mt-0.5">Minutes</span>
+                            <i class="fa-solid fa-stopwatch text-emerald-400 text-xs sm:text-sm mt-1"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECONDS CIRCLE -->
+                <div class="flex flex-col items-center group">
+                    <div class="relative w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center">
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                            <circle class="circle-bg" cx="50" cy="50" r="42"/>
+                            <circle id="seconds-progress" class="circle-progress" cx="50" cy="50" r="42" stroke-dasharray="263.89" stroke-dashoffset="0"/>
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                            <span id="seconds" class="text-3xl sm:text-4xl font-black text-white tracking-tight drop-shadow">00</span>
+                            <span class="text-xs sm:text-sm font-semibold text-emerald-200 mt-0.5">Seconds</span>
+                            <i class="fa-solid fa-hourglass-half text-emerald-400 text-xs sm:text-sm mt-1 animate-spin" style="animation-duration: 4s;"></i>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- FOOTER GOOD LUCK BANNER -->
+        <div class="glass-banner rounded-full px-6 py-3.5 w-full max-w-2xl flex items-center justify-center space-x-3 text-center shadow-xl">
+            <!-- Trophy Icon -->
+            <div class="text-yellow-400 text-2xl sm:text-3xl drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+            
+            <!-- Banner Text -->
+            <h4 class="font-handwriting text-2xl sm:text-3xl text-white font-bold tracking-wide">
+                Good Luck for Your O/L Exam...
+            </h4>
+
+            <!-- Outline Heart Icon -->
+            <div class="text-yellow-300 text-xl sm:text-2xl transform hover:scale-125 transition-transform">
+                <i class="fa-regular fa-heart"></i>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Circumference of circles (r = 42 -> 2 * PI * 42 ≈ 263.89)
+        const CIRCUMFERENCE = 263.89;
+        
+        // Target Timezone Offset in minutes for UTC+05:30 (+330 minutes)
+        const IST_OFFSET_MINUTES = 330;
+
+        /**
+         * Fixed Target Exam Date: Dec 8, 2026 06:00:00 AM IST (+05:30)
+         */
+        function getDefaultExamDate() {
+            let targetIsoStr = `2026-12-08T06:00:00+05:30`;
+            return new Date(targetIsoStr);
+        }
+
+        // Fixed target date
+        const targetDate = getDefaultExamDate();
+
+        // Elements
+        const daysEl = document.getElementById('days');
+        const hoursEl = document.getElementById('hours');
+        const minutesEl = document.getElementById('minutes');
+        const secondsEl = document.getElementById('seconds');
+
+        const daysProg = document.getElementById('days-progress');
+        const hoursProg = document.getElementById('hours-progress');
+        const minutesProg = document.getElementById('minutes-progress');
+        const secondsProg = document.getElementById('seconds-progress');
+
+        const cardDayDisplay = document.getElementById('card-day-display');
+        const cardFullDate = document.getElementById('card-full-date');
+
+        // Update UI date display matching the target date
+        function updateDateHeaderDisplays() {
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            
+            // Convert targetDate to IST representation for header card
+            const utcTime = targetDate.getTime();
+            const istDateObj = new Date(utcTime + (IST_OFFSET_MINUTES * 60000));
+            
+            // Format Day and Month
+            const dayNum = String(istDateObj.getUTCDate()).padStart(2, '0');
+            const monthName = monthNames[istDateObj.getUTCMonth()];
+            
+            cardDayDisplay.textContent = dayNum;
+            cardFullDate.textContent = `${monthName} ${istDateObj.getUTCDate()}`;
+        }
+
+        // Helper to update SVG progress circle offset
+        function setProgress(circleElement, percent) {
+            const offset = CIRCUMFERENCE - (percent * CIRCUMFERENCE);
+            circleElement.style.strokeDashoffset = offset;
+        }
+
+        // Animate value changes dynamically
+        function updateValue(element, newValue) {
+            const formattedValue = String(newValue).padStart(2, '0');
+            if (element.textContent !== formattedValue) {
+                element.textContent = formattedValue;
+                element.classList.remove('number-change');
+                void element.offsetWidth; // Trigger reflow
+                element.classList.add('number-change');
+            }
+        }
+
+        // Live Countdown Calculation Loop (Strictly calculated in UTC / UTC+05:30)
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = targetDate.getTime() - now;
+
+            if (distance <= 0) {
+                updateValue(daysEl, 0);
+                updateValue(hoursEl, 0);
+                updateValue(minutesEl, 0);
+                updateValue(secondsEl, 0);
+
+                setProgress(daysProg, 1);
+                setProgress(hoursProg, 1);
+                setProgress(minutesProg, 1);
+                setProgress(secondsProg, 1);
+                return;
+            }
+
+            // Time Calculations
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Trigger Flash effect on exact minute change (when seconds reach 0)
+            if (seconds === 0 && distance > 0) {
+                const panel = document.querySelector('.glass-countdown-panel');
+                if (panel) {
+                    panel.classList.remove('minute-flash');
+                    void panel.offsetWidth; // Reflow
+                    panel.classList.add('minute-flash');
+                }
+            }
+
+            // Update Text Values with smooth animation
+            updateValue(daysEl, days);
+            updateValue(hoursEl, hours);
+            updateValue(minutesEl, minutes);
+            updateValue(secondsEl, seconds);
+
+            // Calculate ratios for dynamic circle progress
+            // Days ring is 100% full at 40 days
+            const daysPercent = Math.min(days / 40, 1);
+            const hoursPercent = hours / 24;
+            const minutesPercent = minutes / 60;
+            const secondsPercent = seconds / 60;
+
+            setProgress(daysProg, daysPercent);
+            setProgress(hoursProg, hoursPercent);
+            setProgress(minutesProg, minutesPercent);
+            setProgress(secondsProg, secondsPercent);
+        }
+
+        // Settings Modal Controls
+        function toggleSettingsModal() {
+            const modal = document.getElementById('settings-modal');
+            const input = document.getElementById('target-date-input');
+            
+            // Format target date for datetime-local picker in UTC+5:30 equivalent
+            const istTime = new Date(targetDate.getTime() + (IST_OFFSET_MINUTES * 60000));
+            const localISOTime = istTime.toISOString().slice(0, 16);
+            input.value = localISOTime;
+
+            modal.classList.toggle('hidden');
+            modal.classList.toggle('flex');
+        }
+
+        function saveTargetDate() {
+            const input = document.getElementById('target-date-input');
+            if (input.value) {
+                // Parse chosen date as UTC+05:30
+                const selectedIso = `${input.value}:00+05:30`;
+                targetDate = new Date(selectedIso);
+                localStorage.setItem('ol_exam_target_date_ist', targetDate.toISOString());
+                updateDateHeaderDisplays();
+                updateCountdown();
+                toggleSettingsModal();
+            }
+        }
+
+        // Generate ambient floating light particles in background
+        function generateParticles() {
+            const container = document.getElementById('particles-container');
+            const particleCount = 20;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                const size = Math.random() * 6 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                particle.style.animationDuration = `${Math.random() * 6 + 5}s`;
+                particle.style.animationDelay = `${Math.random() * 4}s`;
+                
+                container.appendChild(particle);
+            }
+        }
+
+        // Generate Dynamic Animated Floating Books, Formulas, and Stationery Elements
+        function generateFloatingStudyElements() {
+            const container = document.getElementById('study-elements-container');
+            container.innerHTML = ''; // Clear existing elements to prevent accumulation
+
+            const items = [
+                { type: 'icon', value: 'fa-solid fa-book-open', color: '#4ade80' },
+                { type: 'icon', value: 'fa-solid fa-graduation-cap', color: '#facc15' },
+                { type: 'icon', value: 'fa-solid fa-pencil', color: '#38bdf8' },
+                { type: 'icon', value: 'fa-solid fa-calculator', color: '#f43f5e' },
+                { type: 'icon', value: 'fa-solid fa-microscope', color: '#a855f7' },
+                { type: 'icon', value: 'fa-solid fa-lightbulb', color: '#fde047' },
+                { type: 'text', value: 'E = mc²', color: '#6ee7b7' },
+                { type: 'text', value: 'a² + b² = c²', color: '#fde047' },
+                { type: 'text', value: 'F = ma', color: '#93c5fd' },
+                { type: 'text', value: 'H₂O', color: '#c084fc' },
+                { type: 'text', value: 'sin²θ + cos²θ = 1', color: '#f472b6' },
+                { type: 'text', value: 'PV = nRT', color: '#4ade80' }
+            ];
+
+            const itemCount = 14;
+            for (let i = 0; i < itemCount; i++) {
+                const el = document.createElement('div');
+                el.classList.add('floating-study-item');
+                
+                const item = items[i % items.length];
+                
+                if (item.type === 'icon') {
+                    el.innerHTML = `<i class="${item.value}"></i>`;
+                    el.style.fontSize = `${Math.random() * 14 + 18}px`;
+                } else {
+                    el.textContent = item.value;
+                    el.style.fontSize = `${Math.random() * 10 + 20}px`;
+                    el.style.fontWeight = 'bold';
+                }
+                
+                el.style.color = item.color;
+                // Distributed positioning to avoid clustering and clipping on screen edges
+                const leftPos = (i * (85 / itemCount)) + 5 + (Math.random() * 4);
+                el.style.left = `${leftPos}%`;
+                el.style.animationDuration = `${Math.random() * 10 + 12}s`;
+                el.style.animationDelay = `${Math.random() * 8}s`;
+                
+                container.appendChild(el);
+            }
+        }
+
+        // Cycle background images smoothly every 6 seconds
+        function initBackgroundTransitions() {
+            const layers = [
+                document.getElementById('bg-layer-1'),
+                document.getElementById('bg-layer-2'),
+                document.getElementById('bg-layer-3'),
+                document.getElementById('bg-layer-4')
+            ];
+            let currentIdx = 0;
+
+            setInterval(() => {
+                layers[currentIdx].classList.remove('active');
+                currentIdx = (currentIdx + 1) % layers.length;
+                layers[currentIdx].classList.add('active');
+            }, 6000);
+        }
+
+        // Initialize Page Logic on Load
+        window.onload = function() {
+            updateDateHeaderDisplays();
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+            generateParticles();
+            generateFloatingStudyElements();
+            initBackgroundTransitions();
+        };
+    </script>
+</body>
+</html>
